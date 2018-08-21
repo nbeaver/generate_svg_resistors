@@ -235,7 +235,7 @@ def write_series(outdir, series, mirror=False):
             else:
                 ohm = decimal.Decimal(digits)/10**-i
             if mirror:
-                filename = "resistor_{ohm:013.3f}Ohm_{tol}_mirrored.svg".format(ohm=ohm, tol=tol)
+                filename = "resistor_mirrored_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
             else:
                 filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
             filepath = os.path.join(outdir, filename)
