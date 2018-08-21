@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import argparse
 import decimal
 
 svg_width=400
@@ -151,11 +152,24 @@ def get_band(fill_color, band_position, n_bands = 4, indent_level=2):
     svg = f'<rect x="{x}"  y="{y}" width="{band_width}" height="{band_height}" fill="{fill_color}" stroke="black" stroke-width="{stroke_width}" />'
     return ' '*indent_level + svg + '\n'
 
-if __name__ == '__main__':
+def write_svg(fp, ohms, tolerance):
     svg = ''
     svg += preamble
     svg += get_wire()
     svg += get_resistor_body()
-    svg += get_resistor_bands(1000, tolerance="5%")
+    svg += get_resistor_bands(ohms, tolerance)
     svg += postamble
-    print(svg)
+    fp.write(svg)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate SVGs of resistors.'
+    )
+    parser.add_argument(
+        'svg_file',
+        type=argparse.FileType('w'),
+        help='SVG filepath',
+    )
+    args = parser.parse_args()
+
+    write_svg(args.svg_file, ohms=1000, tolerance="5%")
