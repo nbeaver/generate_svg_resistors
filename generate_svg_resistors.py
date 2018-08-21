@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import decimal
+import sys
 
 svg_width=400
 svg_height=200
@@ -53,12 +54,10 @@ def get_resistor_body(indent_level=2):
     svg = f'<rect x="{x}"  y="{y}" width="{body_width}" height="{body_height}" fill="khaki" rx="{rx}" ry="{ry}" />'
     return ' '*indent_level + svg + '\n'
 
-def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
+def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
     assert ohms_raw >= 0
     assert n_bands in (4, 5, 6)
     if n_bands != 4:
-        raise NotImplementedError
-    if mirrored:
         raise NotImplementedError
 
     ohms = decimal.Decimal(ohms_raw)
@@ -121,10 +120,16 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
     band_color_3 = multiplier_color[multiplier]
     band_color_4 = tolerance_color[tolerance]
     svg = ''
-    svg += get_band(band_color_1, 1)
-    svg += get_band(band_color_2, 2)
-    svg += get_band(band_color_3, 3)
-    svg += get_band(band_color_4, 4)
+    if mirror:
+        svg += get_band(band_color_1, 4)
+        svg += get_band(band_color_2, 3)
+        svg += get_band(band_color_3, 2)
+        svg += get_band(band_color_4, 1)
+    else:
+        svg += get_band(band_color_1, 1)
+        svg += get_band(band_color_2, 2)
+        svg += get_band(band_color_3, 3)
+        svg += get_band(band_color_4, 4)
     return svg
 
 def get_band_0Ohm(n_bands = 4, indent_level=2):
@@ -153,12 +158,12 @@ def get_band(fill_color, band_position, n_bands = 4, indent_level=2):
     svg = f'<rect x="{x}"  y="{y}" width="{band_width}" height="{band_height}" fill="{fill_color}" stroke="black" stroke-width="{stroke_width}" />'
     return ' '*indent_level + svg + '\n'
 
-def write_svg(fp, ohms, tolerance="20%"):
+def write_svg(fp, ohms, tolerance="20%", mirror=False):
     svg = ''
     svg += preamble
     svg += get_wire()
     svg += get_resistor_body()
-    svg += get_resistor_bands(ohms, tolerance)
+    svg += get_resistor_bands(ohms, tolerance, mirror=mirror)
     svg += postamble
     fp.write(svg)
 
@@ -221,7 +226,7 @@ E24_series = [
     ('9.1', "5%"),
 ]
 
-def write_series(outdir, series):
+def write_series(outdir, series, mirror=False):
     for i in range(-2, 11):
         for val in series:
             digits, tol = val
@@ -229,10 +234,16 @@ def write_series(outdir, series):
                 ohm = decimal.Decimal(digits)*10**i
             else:
                 ohm = decimal.Decimal(digits)/10**-i
-            filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
+            if mirror:
+                filename = "resistor_{ohm:013.3f}Ohm_{tol}_mirrored.svg".format(ohm=ohm, tol=tol)
+            else:
+                filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
             filepath = os.path.join(outdir, filename)
+            if os.path.exists(filepath):
+                sys.stderr.write("Error: path already exists: '{}'\n".format(filepath))
+                sys.exit(1)
             with open(filepath, 'w') as fp:
-                write_svg(fp, ohms=ohm, tolerance=tol)
+                write_svg(fp, ohms=ohm, tolerance=tol, mirror=mirror)
 
 def writable_directory(path):
     if not os.path.isdir(path):
@@ -260,5 +271,8 @@ if __name__ == '__main__':
         write_svg(fp, ohms=0)
 
     write_series(args.out_dir, E6_series)
+    # Don't mirror E6 because it's hard to tell whether it's reversed.
     write_series(args.out_dir, E12_series)
+    write_series(args.out_dir, E12_series, mirror=True)
     write_series(args.out_dir, E24_series)
+    write_series(args.out_dir, E24_series, mirror=True)
