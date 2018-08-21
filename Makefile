@@ -1,6 +1,6 @@
-SVG :=out.svg
+OUTDIR :=out
 all :
-	./generate_svg_resistors.py $(SVG)
+	./generate_svg_resistors.py $(OUTDIR)/
 
 clean :
-	rm -- $(SVG)
+	rm -- $(OUTDIR)/*.svg

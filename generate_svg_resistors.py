@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import argparse
 import decimal
 
 svg_width=400
@@ -161,15 +160,100 @@ def write_svg(fp, ohms, tolerance):
     svg += postamble
     fp.write(svg)
 
+E6_series = [
+    ('1.0', "20%"),
+    ('1.5', "20%"),
+    ('2.2', "20%"),
+    ('3.3', "20%"),
+    ('4.7', "20%"),
+    ('6.8', "20%"),
+]
+# Example of how this works:
+# Value Tolerance Min  Max  
+#  1.0  20%       0.80  1.20
+#  1.5  20%       1.20  1.80
+#  2.2  20%       1.76  2.64
+#  3.3  20%       2.64  3.96
+#  4.7  20%       3.76  5.64
+#  6.8  20%       5.44  8.16
+# 10.0  20%       8.00 12.00
+
+E12_series = [
+    ('1.0', "10%"),
+    ('1.2', "10%"),
+    ('1.5', "10%"),
+    ('1.8', "10%"),
+    ('2.2', "10%"),
+    ('2.7', "10%"),
+    ('3.3', "10%"),
+    ('3.9', "10%"),
+    ('4.7', "10%"),
+    ('5.6', "10%"),
+    ('6.8', "10%"),
+    ('8.2', "10%"),
+]
+E24_series = [
+    ('1.0', "5%"),
+    ('1.1', "5%"),
+    ('1.2', "5%"),
+    ('1.3', "5%"),
+    ('1.5', "5%"),
+    ('1.6', "5%"),
+    ('1.8', "5%"),
+    ('2.0', "5%"),
+    ('2.2', "5%"),
+    ('2.4', "5%"),
+    ('2.7', "5%"),
+    ('3.0', "5%"),
+    ('3.3', "5%"),
+    ('3.6', "5%"),
+    ('3.9', "5%"),
+    ('4.3', "5%"),
+    ('4.7', "5%"),
+    ('5.1', "5%"),
+    ('5.6', "5%"),
+    ('6.2', "5%"),
+    ('6.8', "5%"),
+    ('7.5', "5%"),
+    ('8.2', "5%"),
+    ('9.1', "5%"),
+]
+
+def write_series(outdir, series):
+    for i in range(-3, 10):
+        for val in series:
+            digits, tol = val
+            if i > 0:
+                ohm = decimal.Decimal(digits)*10**i
+            else:
+                ohm = decimal.Decimal(digits)/10**-i
+            filename = "resistor_{ohm:013.3f}_{tol}.svg".format(ohm=ohm, tol=tol)
+            filepath = os.path.join(outdir, filename)
+            with open(filepath, 'w') as fp:
+                write_svg(fp, ohms=ohm, tolerance=tol)
+
+def writable_directory(path):
+    if not os.path.isdir(path):
+        raise argparse.ArgumentTypeError(
+            'not an existing directory: {}'.format(path))
+    if not os.access(path, os.W_OK):
+        raise argparse.ArgumentTypeError(
+            'not a writable directory: {}'.format(path))
+    return path
+
 if __name__ == '__main__':
+    import argparse
+    import os.path
     parser = argparse.ArgumentParser(
         description='Generate SVGs of resistors.'
     )
     parser.add_argument(
-        'svg_file',
-        type=argparse.FileType('w'),
-        help='SVG filepath',
+        'out_dir',
+        type=writable_directory,
+        help='Target directory',
     )
     args = parser.parse_args()
 
-    write_svg(args.svg_file, ohms=1000, tolerance="5%")
+    write_series(args.out_dir, E6_series)
+    write_series(args.out_dir, E12_series)
+    write_series(args.out_dir, E24_series)
