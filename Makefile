@@ -4,4 +4,8 @@ all :
 	./generate_svg_resistors.py $(OUTDIR)/ $(TSV)
 
 clean :
-	rm -- $(OUTDIR)/*.svg
+	rm -- $(TSV) $(OUTDIR)/*.svg
+
+INSTALLDIR:=$(HOME)/.local/share/Anki2/Nathaniel/collection.media
+install :
+	cp $(OUTDIR)/*.svg $(INSTALLDIR)/
