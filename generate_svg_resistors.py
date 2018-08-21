@@ -143,7 +143,7 @@ def get_band(fill_color, band_position, n_bands = 4, indent_level=2):
     if fill_color is None:
         return ''
     max_width = int(body_width / (n_bands + 1))
-    band_width = int((2/3) * max_width)
+    band_width = int(max_width * 2.0 / 3.0)
     band_height = body_height
     x = int(margin_x + max_width*band_position - (band_width / 2))
     y = margin_y
