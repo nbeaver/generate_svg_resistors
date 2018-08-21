@@ -271,7 +271,7 @@ if __name__ == '__main__':
         write_svg(fp, ohms=0)
 
     write_series(args.out_dir, E6_series)
-    # Don't mirror E6 because it's hard to tell whether it's reversed.
+    write_series(args.out_dir, E6_series, mirror=True)
     write_series(args.out_dir, E12_series)
     write_series(args.out_dir, E12_series, mirror=True)
     write_series(args.out_dir, E24_series)
