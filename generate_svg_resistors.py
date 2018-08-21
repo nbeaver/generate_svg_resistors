@@ -10,7 +10,7 @@ body_height = int(svg_height * 1/2)
 margin_x = int((svg_width  - body_width ) * 1/2)
 margin_y = int((svg_height - body_height) * 1/2)
 
-preamble = f"""
+preamble = f"""\
 <svg version="1.1"
      baseProfile="full"
      width="{svg_width}" height="{svg_height}"
