@@ -226,7 +226,25 @@ E24_series = [
     ('9.1', "5%"),
 ]
 
-def write_series(outdir, series, mirror=False):
+def idiomatic_name(ohms):
+    import math
+    magnitude = math.log10(ohms)
+    if magnitude >= 9:
+        name = "{} G Ohm".format(ohms/10**9)
+    elif magnitude >= 6:
+        name = "{} M Ohm".format(ohms/10**6)
+    elif magnitude >= 3:
+        name = "{} k Ohm".format(ohms/10**3)
+    elif magnitude < -1:
+        # TODO: fix number of sig figs in decimal.
+        name = "{:.0f} m Ohm".format(ohms*10**3)
+    elif magnitude > 1:
+        name = "{:.0f} Ohm".format(ohms)
+    else:
+        name = "{} Ohm".format(ohms)
+    return name
+
+def write_series(outdir, fp_tsv, series, mirror=False):
     for i in range(-2, 11):
         for val in series:
             digits, tol = val
@@ -244,6 +262,12 @@ def write_series(outdir, series, mirror=False):
                 sys.exit(1)
             with open(filepath, 'w') as fp:
                 write_svg(fp, ohms=ohm, tolerance=tol, mirror=mirror)
+
+            note_front = '<img src="{}">'.format(filename)
+            note_back = '{}<div>{} tolerance</div>'.format(idiomatic_name(ohm), tol)
+            if mirror:
+                note_back += '<div>(mirrored)</div>'
+            fp_tsv.write('{}\t{}\n'.format(note_front, note_back))
 
 def writable_directory(path):
     if not os.path.isdir(path):
@@ -263,16 +287,21 @@ if __name__ == '__main__':
     parser.add_argument(
         'out_dir',
         type=writable_directory,
-        help='Target directory',
+        help='Target directory for SVGs',
+    )
+    parser.add_argument(
+        'tsvfile',
+        type=argparse.FileType('w'),
+        help='TSV file for import into Anki deck',
     )
     args = parser.parse_args()
 
     with open(os.path.join(args.out_dir, "resistor_0Ohm.svg"), 'w') as fp:
         write_svg(fp, ohms=0)
 
-    write_series(args.out_dir, E6_series)
-    write_series(args.out_dir, E6_series, mirror=True)
-    write_series(args.out_dir, E12_series)
-    write_series(args.out_dir, E12_series, mirror=True)
-    write_series(args.out_dir, E24_series)
-    write_series(args.out_dir, E24_series, mirror=True)
+    write_series(args.out_dir, args.tsvfile, E6_series)
+    write_series(args.out_dir, args.tsvfile, E6_series, mirror=True)
+    write_series(args.out_dir, args.tsvfile, E12_series)
+    write_series(args.out_dir, args.tsvfile, E12_series, mirror=True)
+    write_series(args.out_dir, args.tsvfile, E24_series)
+    write_series(args.out_dir, args.tsvfile, E24_series, mirror=True)
