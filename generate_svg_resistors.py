@@ -79,7 +79,7 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
     }
     multiplier_color = {
         decimal.Decimal(1)/10**3 : "pink",
-        decimal.Decimal(1)/10**2 : "url(#silverbad)",
+        decimal.Decimal(1)/10**2 : "url(#silverband)",
         decimal.Decimal(1)/10**1 : "url(#goldband)",
         decimal.Decimal(1)*10**0 : "black",
         decimal.Decimal(1)*10**1 : "brown",
@@ -94,7 +94,7 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
     }
     tolerance_color = {
         "20%"   : None,
-        "10%"   : "url(#silverbad)",
+        "10%"   : "url(#silverband)",
         "5%"    : "url(#goldband)",
         "1%"    : "brown",
         "2%"    : "red",
