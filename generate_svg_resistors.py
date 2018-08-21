@@ -114,7 +114,8 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
         digit_2 = 0
     assert digit_2 in digit_color
     multiplier = ohms / decimal.Decimal(digit_1*10 + digit_2)
-    assert multiplier in multiplier_color
+    if multiplier not in multiplier_color:
+        raise ValueError("multiplier not valid: '{}'".format(multiplier))
     band_color_1 = digit_color[digit_1]
     band_color_2 = digit_color[digit_2]
     band_color_3 = multiplier_color[multiplier]
