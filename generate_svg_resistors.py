@@ -222,7 +222,7 @@ E24_series = [
 ]
 
 def write_series(outdir, series):
-    for i in range(-3, 10):
+    for i in range(-2, 11):
         for val in series:
             digits, tol = val
             if i > 0:
