@@ -54,7 +54,7 @@ def get_resistor_body(indent_level=2):
     return ' '*indent_level + svg + '\n'
 
 def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirrored=False):
-    assert ohms_raw > 0
+    assert ohms_raw >= 0
     assert n_bands in (4, 5, 6)
     if n_bands != 4:
         raise NotImplementedError
@@ -132,6 +132,7 @@ def get_band_0Ohm(n_bands = 4, indent_level=2):
     # for an even number of bands.
     max_width = int(body_width / (n_bands + 1))
     band_width = int((2/3) * max_width)
+    band_height = body_height
     x = int(margin_x + (body_width / 2) - (band_width / 2))
     y = margin_y
     stroke_width = int(min(svg_width, svg_height)*1/40)
@@ -151,7 +152,7 @@ def get_band(fill_color, band_position, n_bands = 4, indent_level=2):
     svg = f'<rect x="{x}"  y="{y}" width="{band_width}" height="{band_height}" fill="{fill_color}" stroke="black" stroke-width="{stroke_width}" />'
     return ' '*indent_level + svg + '\n'
 
-def write_svg(fp, ohms, tolerance):
+def write_svg(fp, ohms, tolerance="20%"):
     svg = ''
     svg += preamble
     svg += get_wire()
@@ -227,7 +228,7 @@ def write_series(outdir, series):
                 ohm = decimal.Decimal(digits)*10**i
             else:
                 ohm = decimal.Decimal(digits)/10**-i
-            filename = "resistor_{ohm:013.3f}_{tol}.svg".format(ohm=ohm, tol=tol)
+            filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
             filepath = os.path.join(outdir, filename)
             with open(filepath, 'w') as fp:
                 write_svg(fp, ohms=ohm, tolerance=tol)
@@ -253,6 +254,9 @@ if __name__ == '__main__':
         help='Target directory',
     )
     args = parser.parse_args()
+
+    with open(os.path.join(args.out_dir, "resistor_0Ohm.svg"), 'w') as fp:
+        write_svg(fp, ohms=0)
 
     write_series(args.out_dir, E6_series)
     write_series(args.out_dir, E12_series)
