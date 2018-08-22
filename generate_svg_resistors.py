@@ -245,6 +245,9 @@ def idiomatic_name(ohms):
     return name
 
 def write_series(outdir, fp_tsv, series, mirror=False):
+    # We go from -2 to 10 instead of -3 to 9
+    # since E12 series use 1.0 <= x < 10,
+    # but resistor color code uses 10 <= x < 100
     for i in range(-2, 11):
         for val in series:
             digits, tol = val
