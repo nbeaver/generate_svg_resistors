@@ -275,7 +275,7 @@ def write_series(outdir, fp_tsv, series, mirror=False):
             note_back = ''
             note_back += '<div>{}{}&times;10<sup>{}</sup></div>'.format(digits[0], digits[2], i-1)
             note_back += '<div>{}</div>'.format(idiomatic_name(ohm))
-            note_back += '<div>{} tolerance</div>'.format(tol)
+            note_back += '<div>&plusmn;{}</div>'.format(tol)
             if mirror:
                 note_back += '<div>(mirrored)</div>'
             fp_tsv.write('{}\t{}\n'.format(note_front, note_back))
