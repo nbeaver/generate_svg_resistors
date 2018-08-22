@@ -229,14 +229,19 @@ E24_series = [
 def idiomatic_name(ohms):
     import math
     magnitude = math.log10(ohms)
-    if magnitude >= 9:
-        name = "{} G Ohm".format(ohms/10**9)
+    if magnitude >= 10:
+        name = "{:.0f} G Ohm".format(ohms/10**9)
+    elif magnitude >= 9:
+        name = "{:.1f} G Ohm".format(ohms/10**9)
+    elif magnitude >= 7:
+        name = "{:.0f} M Ohm".format(ohms/10**6)
     elif magnitude >= 6:
-        name = "{} M Ohm".format(ohms/10**6)
+        name = "{:.1f} M Ohm".format(ohms/10**6)
+    elif magnitude >= 4:
+        name = "{:.0f} k Ohm".format(ohms/10**3)
     elif magnitude >= 3:
-        name = "{} k Ohm".format(ohms/10**3)
+        name = "{:.1f} k Ohm".format(ohms/10**3)
     elif magnitude < -1:
-        # TODO: fix number of sig figs in decimal.
         name = "{:.0f} m Ohm".format(ohms*10**3)
     elif magnitude > 1:
         name = "{:.0f} Ohm".format(ohms)
