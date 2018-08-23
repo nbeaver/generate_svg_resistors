@@ -232,6 +232,8 @@ E24_series = [
 ]
 
 def idiomatic_name(ohms):
+    if ohms == 0:
+        return "0 Ohm"
     import math
     magnitude = math.log10(ohms)
     if magnitude >= 10:
@@ -254,6 +256,48 @@ def idiomatic_name(ohms):
         name = "{} Ohm".format(ohms)
     return name
 
+def get_anki_note(filename, ohms, tolerance=None, mirror=False):
+    sign, digits, exponent = ohms.as_tuple()
+    digit_1 = digits[0]
+    try:
+        digit_2 = digits[1]
+    except IndexError:
+        digit_2 = 0
+    # Increase by one
+    # since resistor color code uses 10 <= a < 100
+    # for a * 10^b
+    true_exponent = exponent + 1
+    note_front = '<img src="{}">'.format(filename)
+    note_back = ''
+    note_back += '<div>{}{}&times;10<sup>{}</sup></div>'.format(digit_1, digit_2, true_exponent)
+    note_back += '<div>{}</div>'.format(idiomatic_name(ohms))
+    if tolerance is not None:
+        note_back += '<div>&plusmn;{}</div>'.format(tolerance)
+    if mirror:
+        note_back += '<div>(mirrored)</div>'
+    return note_front, note_back
+
+def get_svg_filename(ohms, tolerance=None, mirror=False):
+    if tolerance is None:
+        # Probably a 0 Ohm resistor.
+        return "resistor_{ohm:013.3f}Ohm.svg".format(ohm=ohms, tol=tolerance)
+    if mirror:
+        return "resistor_mirrored_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+    else:
+        return "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+
+def write_resistor(outdir, fp_tsv, ohm, tol, mirror=False):
+    filename = get_svg_filename(ohm, tol, mirror)
+    filepath = os.path.join(outdir, filename)
+    if os.path.exists(filepath):
+        sys.stderr.write("Error: path already exists: '{}'\n".format(filepath))
+        sys.exit(1)
+    with open(filepath, 'w') as fp:
+        write_svg(fp, ohms=ohm, tolerance=tol, mirror=mirror)
+
+    front, back = get_anki_note(filename, ohms=ohm, tolerance=tol, mirror=mirror)
+    fp_tsv.write('{}\t{}\n'.format(front, back))
+
 def write_series(outdir, fp_tsv, series, mirror=False):
     # We go from -2 to 10 instead of -3 to 9
     # since E12 series use 1.0 <= x < 10,
@@ -265,25 +309,7 @@ def write_series(outdir, fp_tsv, series, mirror=False):
                 ohm = decimal.Decimal(digits)*10**i
             else:
                 ohm = decimal.Decimal(digits)/10**-i
-            if mirror:
-                filename = "resistor_mirrored_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
-            else:
-                filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohm, tol=tol)
-            filepath = os.path.join(outdir, filename)
-            if os.path.exists(filepath):
-                sys.stderr.write("Error: path already exists: '{}'\n".format(filepath))
-                sys.exit(1)
-            with open(filepath, 'w') as fp:
-                write_svg(fp, ohms=ohm, tolerance=tol, mirror=mirror)
-
-            note_front = '<img src="{}">'.format(filename)
-            note_back = ''
-            note_back += '<div>{}{}&times;10<sup>{}</sup></div>'.format(digits[0], digits[2], i-1)
-            note_back += '<div>{}</div>'.format(idiomatic_name(ohm))
-            note_back += '<div>&plusmn;{}</div>'.format(tol)
-            if mirror:
-                note_back += '<div>(mirrored)</div>'
-            fp_tsv.write('{}\t{}\n'.format(note_front, note_back))
+            write_resistor(outdir, fp_tsv, ohm, tol, mirror)
 
 def writable_directory(path):
     if not os.path.isdir(path):
@@ -312,9 +338,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    with open(os.path.join(args.out_dir, "resistor_000000000.000Ohm.svg"), 'w') as fp:
-        write_svg(fp, ohms=0)
-
+    write_resistor(args.out_dir, args.tsvfile, ohm=decimal.Decimal(0), tol=None)
     write_series(args.out_dir, args.tsvfile, E6_series)
     write_series(args.out_dir, args.tsvfile, E6_series, mirror=True)
     write_series(args.out_dir, args.tsvfile, E12_series)
