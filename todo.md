@@ -1,0 +1,2 @@
+- [x] Add Creative Commons license to generated SVGs.
+- [x] Switch color from violet to purple.
