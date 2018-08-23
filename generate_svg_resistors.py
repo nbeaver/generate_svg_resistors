@@ -59,6 +59,23 @@ def get_resistor_body(indent_level=2):
     svg = f'<rect x="{x}"  y="{y}" width="{body_width}" height="{body_height}" fill="khaki" rx="{rx}" ry="{ry}" />'
     return ' '*indent_level + svg + '\n'
 
+def get_digits(ohms, n):
+    if ohms == 0:
+        return [0], 0
+    sign, digits, exponent = ohms.as_tuple()
+    # Since we are adding more digits,
+    # the multiplier exponent needs to be bumped down.
+    extra_digits = n - 1
+    adjusted_exponent = ohms.adjusted() - extra_digits
+    d = []
+    for i in range(n):
+        try :
+            d.append(digits[i])
+        except IndexError:
+            d.append(0)
+
+    return d, adjusted_exponent
+
 def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
     assert ohms_raw >= 0
     assert n_bands in (4, 5, 6)
@@ -82,19 +99,19 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
         9 : "white",
     }
     multiplier_color = {
-        decimal.Decimal(1)/10**3 : "pink",
-        decimal.Decimal(1)/10**2 : "url(#silverband)",
-        decimal.Decimal(1)/10**1 : "url(#goldband)",
-        decimal.Decimal(1)*10**0 : "black",
-        decimal.Decimal(1)*10**1 : "brown",
-        decimal.Decimal(1)*10**2 : "red",
-        decimal.Decimal(1)*10**3 : "orange",
-        decimal.Decimal(1)*10**4 : "yellow",
-        decimal.Decimal(1)*10**5 : "green",
-        decimal.Decimal(1)*10**6 : "blue",
-        decimal.Decimal(1)*10**7 : "purple",
-        decimal.Decimal(1)*10**8 : "gray",
-        decimal.Decimal(1)*10**9 : "white",
+        -3 : "pink",
+        -2 : "url(#silverband)",
+        -1 : "url(#goldband)",
+        0 : "black",
+        1 : "brown",
+        2 : "red",
+        3 : "orange",
+        4 : "yellow",
+        5 : "green",
+        6 : "blue",
+        7 : "purple",
+        8 : "gray",
+        9 : "white",
     }
     tolerance_color = {
         "20%"   : None,
@@ -109,20 +126,15 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
         "0.1%"  : "purple",
         "0.01%" : "gray",
     }
-    sign, digits, exponent = ohms.as_tuple()
-    digit_1 = digits[0]
+    digits, exponent = get_digits(ohms, n_bands - 2)
+    digit_1, digit_2 = digits
     assert digit_1 in digit_color
-    try:
-        digit_2 = digits[1]
-    except IndexError:
-        digit_2 = 0
     assert digit_2 in digit_color
-    multiplier = ohms / decimal.Decimal(digit_1*10 + digit_2)
-    if multiplier not in multiplier_color:
-        raise ValueError("multiplier not valid: '{}'".format(multiplier))
+    if exponent not in multiplier_color:
+        raise ValueError("for {} ohms, multiplier exponent not valid: '{}'".format(ohms, exponent))
     band_color_1 = digit_color[digit_1]
     band_color_2 = digit_color[digit_2]
-    band_color_3 = multiplier_color[multiplier]
+    band_color_3 = multiplier_color[exponent]
     band_color_4 = tolerance_color[tolerance]
     svg = ''
     if mirror:
@@ -257,19 +269,16 @@ def idiomatic_name(ohms):
     return name
 
 def get_anki_note(filename, ohms, tolerance=None, mirror=False):
-    sign, digits, exponent = ohms.as_tuple()
-    digit_1 = digits[0]
-    try:
-        digit_2 = digits[1]
-    except IndexError:
-        digit_2 = 0
-    # Increase by one
-    # since resistor color code uses 10 <= a < 100
-    # for a * 10^b
-    true_exponent = exponent + 1
+    # TODO: make sure this is valid for an HTML tag
     note_front = '<img src="{}">'.format(filename)
     note_back = ''
-    note_back += '<div>{}{}&times;10<sup>{}</sup></div>'.format(digit_1, digit_2, true_exponent)
+    if ohms == 0:
+        note_back += '<div>0</div>'
+    else:
+        n_bands = 4
+        digits, exponent = get_digits(ohms, n_bands - 2)
+        digit_1, digit_2 = digits
+        note_back += '<div>{}{}&times;10<sup>{}</sup></div>'.format(digit_1, digit_2, exponent)
     note_back += '<div>{}</div>'.format(idiomatic_name(ohms))
     if tolerance is not None:
         note_back += '<div>&plusmn;{}</div>'.format(tolerance)
