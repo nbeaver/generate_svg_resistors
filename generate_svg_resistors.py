@@ -289,9 +289,6 @@ def get_svg_filename(ohms, tolerance=None, mirror=False):
 def write_resistor(outdir, fp_tsv, ohm, tol, mirror=False):
     filename = get_svg_filename(ohm, tol, mirror)
     filepath = os.path.join(outdir, filename)
-    if os.path.exists(filepath):
-        sys.stderr.write("Error: path already exists: '{}'\n".format(filepath))
-        sys.exit(1)
     with open(filepath, 'w') as fp:
         write_svg(fp, ohms=ohm, tolerance=tol, mirror=mirror)
 
