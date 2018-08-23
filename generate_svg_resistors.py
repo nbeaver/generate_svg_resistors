@@ -77,7 +77,7 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
         4 : "yellow",
         5 : "green",
         6 : "blue",
-        7 : "violet",
+        7 : "purple",
         8 : "gray",
         9 : "white",
     }
@@ -92,7 +92,7 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
         decimal.Decimal(1)*10**4 : "yellow",
         decimal.Decimal(1)*10**5 : "green",
         decimal.Decimal(1)*10**6 : "blue",
-        decimal.Decimal(1)*10**7 : "violet",
+        decimal.Decimal(1)*10**7 : "purple",
         decimal.Decimal(1)*10**8 : "gray",
         decimal.Decimal(1)*10**9 : "white",
     }
@@ -106,7 +106,7 @@ def get_resistor_bands(ohms_raw, tolerance="20%", n_bands=4, mirror=False):
         "0.02%" : "yellow",
         "0.5%"  : "green",
         "0.25%" : "blue",
-        "0.1%"  : "violet",
+        "0.1%"  : "purple",
         "0.01%" : "gray",
     }
     sign, digits, exponent = ohms.as_tuple()
