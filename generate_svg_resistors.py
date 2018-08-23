@@ -15,6 +15,11 @@ preamble = f"""\
      baseProfile="full"
      width="{svg_width}" height="{svg_height}"
      xmlns="http://www.w3.org/2000/svg">
+  <!--
+  Copyright (c) 2018 Nathaniel Morck Beaver
+  This work is licensed under a Creative Commons Attribution 4.0 International License.
+  https://creativecommons.org/licenses/by/4.0/
+  -->
   <defs>
       <linearGradient id="wire" x1="0" x2="0" y1="0" y2="1">
         <stop offset="0%" stop-color="darkgray"/>
