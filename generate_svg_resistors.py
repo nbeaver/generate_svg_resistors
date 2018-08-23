@@ -312,7 +312,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    with open(os.path.join(args.out_dir, "resistor_0Ohm.svg"), 'w') as fp:
+    with open(os.path.join(args.out_dir, "resistor_000000000.000Ohm.svg"), 'w') as fp:
         write_svg(fp, ohms=0)
 
     write_series(args.out_dir, args.tsvfile, E6_series)
