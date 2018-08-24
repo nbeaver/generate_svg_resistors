@@ -291,9 +291,11 @@ def get_svg_filename(ohms, tolerance=None, mirror=False):
         # Probably a 0 Ohm resistor.
         return "resistor_{ohm:013.3f}Ohm.svg".format(ohm=ohms, tol=tolerance)
     if mirror:
-        return "resistor_mirrored_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+        filename = "resistor_mirrored_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
     else:
-        return "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+        filename = "resistor_{ohm:013.3f}Ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+    filename = filename.replace('%', 'percent')
+    return filename
 
 def write_resistor(outdir, fp_tsv, ohm, tol, mirror=False):
     filename = get_svg_filename(ohm, tol, mirror)
