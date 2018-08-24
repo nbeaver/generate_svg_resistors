@@ -289,11 +289,11 @@ def get_anki_note(filename, ohms, tolerance=None, mirror=False):
 def get_svg_filename(ohms, tolerance=None, mirror=False):
     if tolerance is None:
         # Probably a 0 Ohm resistor.
-        return "resistor_{ohm:013.3f}ohm.svg".format(ohm=ohms, tol=tolerance)
+        return "resistor_{ohm:015.3f}ohm.svg".format(ohm=ohms, tol=tolerance)
     if mirror:
-        filename = "resistor_mirrored_{ohm:013.3f}ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+        filename = "resistor_mirrored_{ohm:015.3f}ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
     else:
-        filename = "resistor_{ohm:013.3f}ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
+        filename = "resistor_{ohm:015.3f}ohm_{tol}.svg".format(ohm=ohms, tol=tolerance)
     filename = filename.replace('%', 'percent')
     return filename
 
