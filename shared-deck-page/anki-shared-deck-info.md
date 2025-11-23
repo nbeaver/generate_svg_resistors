@@ -6,7 +6,7 @@ Sharing a deck makes it available to the general public. If the deck you want to
 
 ## Large Deck?
 
-Shared decks are limited to 250MB in size. If your deck is larger than 250MB, please split it into multiple decks and share them separately. To check the size of the shared deck, please use File>Export in the computer version, and then look at the size of the .apkg file that is created.
+Shared decks are limited to 250MB in size. If your deck is larger than 250MB, please split it into multiple decks and share them separately. To check the size of the shared deck, please use File > Export in the computer version, and then look at the size of the .apkg file that is created.
 
 Title:
 Resistor color codes (3 and 4 bands)
@@ -31,3 +31,5 @@ More information about the deck. Please be specific, as decks that don't contain
 Copyright
 
 I declare that the material I am sharing is entirely my own work, or I have obtained a license from the intellectual property holder(s) to share it here.
+
+https://ankiweb.net/shared/info/1676222770
