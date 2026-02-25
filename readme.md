@@ -13,12 +13,12 @@ The shared deck page is available on AnkiWeb here:
 
 https://ankiweb.net/shared/info/1676222770
 
-Example images:
+Example images (PNG previews instead of SVG):
 
 100 Ohm ±10%
 ![10e1 Ohm resistor: brown black brown silver](./example-pngs/resistor_00000000100.000ohm_10percent.png)
 
-4.7 kOhm ±5%
+4.7 kOhm ±5% (reversed)
 ![47e2 Ohm resistor: yellow purple red gold](./example-pngs/resistor_mirrored_00000004700.000ohm_5percent.png)
 
 0 Ohm resistor
